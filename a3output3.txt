@@ -1,0 +1,26 @@
+Parsing...
+Analyzing...
+Definition of procedure p
+Call of procedure p
+Call of procedure g
+Definition of procedure g
+Call of procedure g
+Definition of procedure g0
+Call of procedure g0
+Locals of procedure p: x1, x2, x3, x4
+Use of variable x1
+Use of variable x2
+Use of variable x3
+Use of variable x4
+Definition of variable y
+Use of variable y
+Locals of procedure g: x, y
+Shadowing of global variable y
+Use of variable x
+Use of variable y
+Use of variable y
+Locals of procedure g0: x
+Definition of variable y
+Shadowing of global variable y
+Use of variable x
+Use of variable y
