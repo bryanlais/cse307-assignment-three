@@ -195,6 +195,10 @@ def traverse(node):
             for i in node.params[:-1]:
                 print(i + ", ", end="")
             print(node.params[-1])
+        #Case to check for shadowing in params
+        for i in node.params:
+            if i in track_vars:
+                print("Shadowing of global variable", i)
         traverse(node.body)
     elif isinstance(node, Call):
         #print("Name:", node.name)
