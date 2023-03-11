@@ -145,7 +145,7 @@ def traverse(node):
     #elif isinstance(node, String):
     #    print("String literal:", node.value)
     if isinstance(node, Array):
-        #print("Array literal:")
+        #]print("Array literal:")
         for element in node.elements:
             traverse(element)
     elif isinstance(node, Index):
@@ -177,14 +177,63 @@ def traverse(node):
         #print("Procedure definition:")
         #print("Name:", node.name)
         #print("Parameters:", node.params)
-        print("Definition of Procedure: ", node.name)
+        print("Locals of procedure", node.name + ": ", end="")
+        if(node.params):
+            for i in node.params[:-1]:
+                print(i + ", ", end="")
+            print(node.params[-1])
         traverse(node.body)
     elif isinstance(node, Call):
-        #print("Procedure call:")
         #print("Name:", node.name)
         #print("Arguments:")
         for arg in node.args:
             traverse(arg)
+
+def traverse2(node):
+    if isinstance(node, Assign):
+        traverse2(node.right)
+        traverse2(node.left)
+    if isinstance(node, Array):
+        #print("Array literal:")
+        for element in node.elements:
+            traverse2(element)
+    elif isinstance(node, Index):
+        traverse2(node.indexable)
+        traverse2(node.index)
+    elif isinstance(node, BinOpExp):
+        #print("Binary operation:", node.op)
+        traverse2(node.left)
+        traverse2(node.right)
+    elif isinstance(node, UniOpExp):
+       #print("Unary operation:", node.op)
+        traverse2(node.arg)
+    elif isinstance(node, Print):
+        #\print("Print statement:")
+        traverse2(node.exp)
+    elif isinstance(node, Block):
+        #print("Block statement:")
+        for stmt in node.stmts:
+            traverse2(stmt)
+    elif isinstance(node, If):
+        #print
+        traverse2(node.exp)
+        traverse2(node.stmt)
+    elif isinstance(node, While):
+        #print("While statement:")
+        traverse2(node.exp)
+        traverse2(node.stmt)
+    elif isinstance(node, Def):
+        #print("Procedure definition:")
+        #print("Name:", node.name)
+        #print("Parameters:", node.params)
+        print("Definition of Procedure: ", node.name)
+        traverse2(node.body)
+    elif isinstance(node, Call):
+        print("Call of procedure", node.name)
+        #print("Name:", node.name)
+        #print("Arguments:")
+        for arg in node.args:
+            traverse2(arg)
 
 # Below is the driver code, which parses a given MustScript program
 # and analyzes the definitions and uses of procedures and variables
@@ -199,12 +248,15 @@ try:
 
     # Try to analyze the program.
     print('Analyzing...')
-    
-    traverse(node)
 
     # ... set up and call method for analyzing procedures here
+    
+    traverse2(node)
 
     # ... set up and call method for analyzing variables here
+
+    traverse(node)
+
 
 # If an exception is rasied, print the appropriate error.
 except tpg.Error:
