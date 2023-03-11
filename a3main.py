@@ -1,6 +1,11 @@
 import sys
 import tpg
 
+#Global variables to keep track for shadowing, analysis error, etc.
+track_vars = []
+tracked_procedures = []
+tracked_procedure_calls = []
+
 class AnalError(Exception):
     """Class of exceptions raised when an error occurs during analysis."""
 
@@ -132,10 +137,18 @@ def parse(code):
     return parser(code)
 
 def traverse(node):
+    global track_vars
     if isinstance(node, Assign):
+        #If we're assigning a variable to a variable that doesn't exist..
+        #Analsyis Error!
+        if(isinstance(node.right, Var)):
+            if(node.right.name not in track_vars):
+                raise AnalError
         traverse(node.right)
         if(isinstance(node.left, Var)):
             print("Definition of variable", node.left.name)
+            #Add variable to be tracked!
+            track_vars.append(node.left.name)
         else:
             traverse(node.left)
     elif isinstance(node, Var):
@@ -190,6 +203,7 @@ def traverse(node):
             traverse(arg)
 
 def traverse2(node):
+    #Analysis Error should be in the variable analysis (traverse())
     if isinstance(node, Assign):
         traverse2(node.right)
         traverse2(node.left)
@@ -223,13 +237,17 @@ def traverse2(node):
         traverse2(node.exp)
         traverse2(node.stmt)
     elif isinstance(node, Def):
+        global tracked_procedures
+        tracked_procedures.append(node.name)
         #print("Procedure definition:")
         #print("Name:", node.name)
         #print("Parameters:", node.params)
-        print("Definition of Procedure: ", node.name)
+        print("Definition of Procedure:", node.name)
         traverse2(node.body)
     elif isinstance(node, Call):
+        global tracked_procedure_calls
         print("Call of procedure", node.name)
+        tracked_procedure_calls.append(node.name)
         #print("Name:", node.name)
         #print("Arguments:")
         for arg in node.args:
@@ -253,8 +271,17 @@ try:
     
     traverse2(node)
 
-    # ... set up and call method for analyzing variables here
+    # Check to see if there are duplicate procedures...
+    procedure_set = set(tracked_procedures)
+    if len(procedure_set) != len(tracked_procedures):
+        raise AnalError("A procedure that is already defined is being defined again")
 
+    # Check to see each procedure call has a definition.
+    for i in tracked_procedure_calls:
+        if i not in tracked_procedures:
+            raise AnalError("At the end of the program, a procedure that was called was never defined.")
+
+    # ... set up and call method for analyzing variables here
     traverse(node)
 
 
