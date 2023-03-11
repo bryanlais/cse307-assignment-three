@@ -131,6 +131,60 @@ def parse(code):
     parser = Parser()
     return parser(code)
 
+def traverse(node):
+    if isinstance(node, Assign):
+        traverse(node.right)
+        if(isinstance(node.left, Var)):
+            print("Definition of variable", node.left.name)
+        else:
+            traverse(node.left)
+    elif isinstance(node, Var):
+        print("Use of variable",node.name)
+    #elif isinstance(node, Int):
+    #    print("Integer literal:", node.value)
+    #elif isinstance(node, String):
+    #    print("String literal:", node.value)
+    if isinstance(node, Array):
+        #print("Array literal:")
+        for element in node.elements:
+            traverse(element)
+    elif isinstance(node, Index):
+        traverse(node.indexable)
+        traverse(node.index)
+    elif isinstance(node, BinOpExp):
+        #print("Binary operation:", node.op)
+        traverse(node.left)
+        traverse(node.right)
+    elif isinstance(node, UniOpExp):
+       #print("Unary operation:", node.op)
+        traverse(node.arg)
+    elif isinstance(node, Print):
+        #\print("Print statement:")
+        traverse(node.exp)
+    elif isinstance(node, Block):
+        #print("Block statement:")
+        for stmt in node.stmts:
+            traverse(stmt)
+    elif isinstance(node, If):
+        #print
+        traverse(node.exp)
+        traverse(node.stmt)
+    elif isinstance(node, While):
+        #print("While statement:")
+        traverse(node.exp)
+        traverse(node.stmt)
+    elif isinstance(node, Def):
+        #print("Procedure definition:")
+        #print("Name:", node.name)
+        #print("Parameters:", node.params)
+        print("Definition of Procedure: ", node.name)
+        traverse(node.body)
+    elif isinstance(node, Call):
+        #print("Procedure call:")
+        #print("Name:", node.name)
+        #print("Arguments:")
+        for arg in node.args:
+            traverse(arg)
 
 # Below is the driver code, which parses a given MustScript program
 # and analyzes the definitions and uses of procedures and variables
@@ -145,6 +199,8 @@ try:
 
     # Try to analyze the program.
     print('Analyzing...')
+    
+    traverse(node)
 
     # ... set up and call method for analyzing procedures here
 
